@@ -1,0 +1,6 @@
+* Merge between the work of each participant in a Unity project is so difficult and challenging !!! be careful
+* we should make our games work on all platforms, same gameplay!
+* exercise will be checked on pressed PCs.
+* the flower position should be added by cannon direction * flower_speed * Time.deltaTime, 
+   the speed should be computed as the formula of distance and time (distance/time something like that).
+* 
