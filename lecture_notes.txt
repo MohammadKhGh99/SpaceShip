@@ -3,4 +3,5 @@
 * exercise will be checked on pressed PCs.
 * the flower position should be added by cannon direction * flower_speed * Time.deltaTime, 
    the speed should be computed as the formula of distance and time (distance/time something like that).
-* 
+* don't destroy gameobject, setactive(false) then activate it again, save it in some array or "pool" 
+   then take it again and activate it again
