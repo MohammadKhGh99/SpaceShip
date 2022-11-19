@@ -9,8 +9,6 @@ using UnityEngine.Serialization;
 public class ShipManager : MonoBehaviour
 {
     [SerializeField] private float shipMoveSpeed;
-    // [SerializeField] private int tankId;
-    // [SerializeField] private float delayParam1;
     [SerializeField] private Rigidbody2D shipRb;
     [SerializeField] private GameObject bulletsParent;
     [SerializeField] private int maxBullets;
@@ -25,7 +23,6 @@ public class ShipManager : MonoBehaviour
     void Start()
     {
         _bullets = new GameObject[maxBullets];
-        // NumBullets = 0;
     }
 
     // Update is called once per frame
@@ -44,8 +41,7 @@ public class ShipManager : MonoBehaviour
         
         if (_firstShooting)
         {
-            var tempBullet = Instantiate(Resources.Load("LaserBeam"), parent: bulletsParent.transform) as GameObject;
-            // print(NumBullets);
+            GameObject tempBullet = Instantiate(Resources.Load("LaserBeam"), parent: bulletsParent.transform) as GameObject;
             _bullets[_initialBulletsNum] = tempBullet;
             _initialBulletsNum++;
             NumBullets++;
@@ -111,6 +107,14 @@ public class ShipManager : MonoBehaviour
             GameManager.NumDiamonds--;
             col.gameObject.SetActive(false);
             GameManager.Score += 3;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D col)
+    {
+        if (col.gameObject.name.StartsWith("Evil"))
+        {
+            GameManager.Score -= 3;
         }
     }
 }

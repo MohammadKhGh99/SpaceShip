@@ -31,11 +31,12 @@ public class SheepManager : MonoBehaviour
         sheep.AddForce(_movement * maxSpeed);
     }
 
-    private void OnCollisionEnter2D(Collision2D col)
-    {
-        if (col.collider.name.Contains("Sheep"))
-        {
-            GameManager.Score -= 5;
-        }
-    }
+    // private void OnCollisionEnter2D(Collision2D col)
+    // {
+    //     if (col.collider.name.Contains("Sheep"))
+    //     {
+    //         // ScoreManager.instance.Reduce5Points();
+    //         GameManager.Score -= 3;
+    //     }
+    // }
 }
