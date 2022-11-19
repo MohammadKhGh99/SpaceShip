@@ -10,15 +10,18 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private GameObject shipParent;
     [SerializeField] private GameObject sheepParent;
+    [SerializeField] private GameObject diamondParent;
     [SerializeField] private CinemachineVirtualCamera followingCamera;
     [SerializeField] private int maxSheeps;
     [SerializeField] private int maxDiamonds;
+    [SerializeField] private Text timeText;
 
     private GameObject[] _sheeps;
     private GameObject[] _diamonds;
 
     private int _sheepPrefabs = 4;
     private int _diamondPrefabs = 3;
+    private string _initialTimeText = "Time: ";
 
     private int _fpsCounter;
     private float _fpsTime;
@@ -30,21 +33,25 @@ public class GameManager : MonoBehaviour
     public static int NumSheeps;
     public static int NumDiamonds;
     public static int Score = 0;
+    private float _currentSeconds = 0;
     
-    private readonly Vector3 _minPosition = new(-39.75f, -8.9f, 0);
-    private readonly Vector3 _maxPosition = new(39.75f, 8.9f, 0);
+    private readonly Vector3 _minPosition = new(-39, -8.5f, 0);
+    private readonly Vector3 _maxPosition = new(39, 8.5f, 0);
     private readonly string[] _sheepsTypes = { "WhiteSheep", "BlackHeadSheep", "BlackSheep", "EvilSheep" };
     private readonly string[] _diamondsTypes = { "Yellow_1p", "Blue_2p", "Red_3p" };
 
     // Start is called before the first frame update
     void Start()
     {
+        timeText.text = _initialTimeText;
+        
         _sheeps = new GameObject[maxSheeps];
         _diamonds = new GameObject[maxDiamonds];
 
         GameObject ship = Instantiate(Resources.Load("spaceship"), parent: shipParent.transform) as GameObject;
         followingCamera.Follow = ship.transform;
-        
+
+        bool eviled = false;
         int maxLen = Math.Max(maxDiamonds, maxSheeps);
         for (int i = 0; i < maxLen; i++)
         {
@@ -57,15 +64,24 @@ public class GameManager : MonoBehaviour
                     Random.Range(_minPosition.y, _maxPosition.y),
                     Random.Range(_minPosition.z, _maxPosition.z));
 
-                string sheepType = _sheepsTypes[Random.Range(0, _sheepPrefabs)];
+                string sheepType = !eviled ? "EvilSheep" : _sheepsTypes[Random.Range(0, _sheepPrefabs)];
+                eviled = true;
+                // if (!eviled)
+                // {
+                //     sheepType = "EvilSheep";
+                //     eviled = true;
+                // }
+                // else
+                // {
+                //     sheepType = _sheepsTypes[Random.Range(0, _sheepPrefabs)];   
+                // }
 
                 GameObject tempSheep =
                     Instantiate(Resources.Load(sheepType), randomPos, Quaternion.identity, sheepParent.transform) as
                         GameObject;
-                if (sheepType.StartsWith("Evil"))
-                {
-                    tempSheep.transform.localScale = new Vector3(1, 1, 0);
-                }
+                
+                // tempSheep.transform.localScale = new Vector3(1, 1, 0);
+                
                 _sheeps[i] = tempSheep;
             }
 
@@ -79,7 +95,7 @@ public class GameManager : MonoBehaviour
                 string diamondType = _diamondsTypes[Random.Range(0, _diamondPrefabs)];
                 // print(diamondType);
                 GameObject tempDiamond =
-                    Instantiate(Resources.Load(diamondType), randomPos, Quaternion.identity) as GameObject;
+                    Instantiate(Resources.Load(diamondType), randomPos, Quaternion.identity, diamondParent.transform) as GameObject;
                 _diamonds[i] = tempDiamond;
             }
         }
@@ -93,10 +109,16 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // Showing fps value
+        _currentSeconds += Time.deltaTime;
+        int minutes = ((int)(_currentSeconds / 60)) % 60;
+        int seconds = ((int)_currentSeconds) % 60;
+        // Showing the elapsed time in game
+        timeText.text = _initialTimeText + $"{minutes:00}:{seconds:00}";
+
         _fpsCounter++;
         _fpsTime -= Time.deltaTime;
 
+        // Showing fps value
         if (_fpsTime <= 0)
         {
             Debug.Log("FPS is: " + _fpsCounter);

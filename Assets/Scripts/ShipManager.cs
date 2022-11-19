@@ -5,6 +5,7 @@ using Cinemachine;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Serialization;
+using UnityEngine.UI;
 
 public class ShipManager : MonoBehaviour
 {
@@ -14,15 +15,17 @@ public class ShipManager : MonoBehaviour
     [SerializeField] private int maxBullets;
     
     public static int NumBullets;
-    private float _bulletCoolDown = 1;
+    private float _bulletCoolDown = 0.5f;
     private bool _firstShooting = true;
     private int _initialBulletsNum;
     private GameObject[] _bullets;
+    private ScoreManager _manager;
 
     // Start is called before the first frame update
     void Start()
     {
         _bullets = new GameObject[maxBullets];
+        _manager = ScoreManager.Instance;
     }
 
     // Update is called once per frame
@@ -37,8 +40,9 @@ public class ShipManager : MonoBehaviour
 
         if (!Input.GetKeyDown(KeyCode.Space) || NumBullets >= maxBullets || _bulletCoolDown > 0) return;
         
-        _bulletCoolDown = 1;
-        
+        _bulletCoolDown = 0.5f;
+        Vector3 tempPos = shipRb.transform.position;
+        Vector3 toPos = new Vector3(tempPos.x, tempPos.y + 3.5f, tempPos.z);
         if (_firstShooting)
         {
             GameObject tempBullet = Instantiate(Resources.Load("LaserBeam"), parent: bulletsParent.transform) as GameObject;
@@ -52,8 +56,7 @@ public class ShipManager : MonoBehaviour
             {
                 if (bullet.activeInHierarchy) continue;
                 NumBullets++;
-                Vector3 tempPos = shipRb.transform.position;
-                bullet.transform.position = new Vector3(tempPos.x, tempPos.y + 1.5f, tempPos.z);
+                bullet.transform.position = toPos;
                 bullet.SetActive(true);
                 break;
             }
@@ -95,18 +98,21 @@ public class ShipManager : MonoBehaviour
             GameManager.NumDiamonds--;
             col.gameObject.SetActive(false);
             GameManager.Score++;
+            _manager.UpdateScore();
         }
         if (col.gameObject.name.StartsWith("Blue"))
         {
             GameManager.NumDiamonds--;
             col.gameObject.SetActive(false);
             GameManager.Score += 2;
+            _manager.UpdateScore();
         }
         if (col.gameObject.name.StartsWith("Red"))
         {
             GameManager.NumDiamonds--;
             col.gameObject.SetActive(false);
             GameManager.Score += 3;
+            _manager.UpdateScore();
         }
     }
 
@@ -115,6 +121,7 @@ public class ShipManager : MonoBehaviour
         if (col.gameObject.name.StartsWith("Evil"))
         {
             GameManager.Score -= 3;
+            _manager.UpdateScore();
         }
     }
 }

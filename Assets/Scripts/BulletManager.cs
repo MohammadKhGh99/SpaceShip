@@ -7,27 +7,28 @@ public class BulletManager : MonoBehaviour
 {
     [SerializeField] private GameObject flower;
     [SerializeField] private GameObject ship;
-    [SerializeField] private float flowerMoveSpeed;
-    
-    private Vector3 _direction;
+    // [SerializeField] private float flowerMoveSpeed;
+    [SerializeField] private Rigidbody2D flowerRb;
+    private float _flowerMoveSpeed = 20;
+    // private Vector3 _direction;
 
     // Start is called before the first frame update
-    void Start()
-    {
-        _direction = ship.transform.up;
-    }
+    // void Start()
+    // {
+    //     _direction = ship.transform.up;
+    // }
 
     void Update()
     {
-        flower.transform.position += _direction * (flowerMoveSpeed * Time.deltaTime);
+        flower.transform.position += Vector3.up * (_flowerMoveSpeed * Time.deltaTime);
     }
 
-    private void OnTriggerEnter2D(Collider2D col)
+    // private void FixedUpdate()
     // {
-    //     throw new NotImplementedException();
+    //     flowerRb.AddForce(Vector3.up * flowerMoveSpeed);
     // }
-    //
-    // private void OnCollisionEnter2D(Collision2D col)
+
+    private void OnTriggerEnter2D(Collider2D col)
     {
         if (col.gameObject.name.Contains("Sheep"))
         {

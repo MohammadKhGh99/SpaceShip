@@ -8,13 +8,12 @@ public class ScoreManager : MonoBehaviour
 {
     [SerializeField] private Text scoreText;
 
-    public static ScoreManager instance;
     private string _initialText = "Score: ";
-
+    public static ScoreManager Instance;
 
     private void Awake()
     {
-        instance = this;
+        Instance = this;
     }
 
     // Start is called before the first frame update
@@ -23,20 +22,8 @@ public class ScoreManager : MonoBehaviour
         scoreText.text = _initialText + GameManager.Score;
     }
 
-    // public void AddPoints(int points)
-    // {
-    //     GameManager.Score += points;
-    //     scoreText.text = _initialText + GameManager.Score;
-    // }
-    //
-    // public void Reduce5Points()
-    // {
-    //     GameManager.Score -= 5;
-    //     scoreText.text = _initialText + GameManager.Score;
-    // }
-    
     // Update is called once per frame
-    void Update()
+    public void UpdateScore()
     {
         scoreText.text = _initialText + GameManager.Score;
     }
