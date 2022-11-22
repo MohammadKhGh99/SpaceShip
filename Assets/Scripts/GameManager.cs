@@ -15,13 +15,14 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int maxSheeps;
     [SerializeField] private int maxDiamonds;
     [SerializeField] private Text timeText;
+    [SerializeField] private AudioSource sheepdSound;
 
     private GameObject[] _sheeps;
     private GameObject[] _diamonds;
 
-    private int _sheepPrefabs = 4;
-    private int _diamondPrefabs = 3;
-    private string _initialTimeText = "Time: ";
+    private const int SheepPrefabs = 4;
+    private const int DiamondPrefabs = 3;
+    private const string InitialTimeText = "Time: ";
 
     private int _fpsCounter;
     private float _fpsTime;
@@ -43,15 +44,15 @@ public class GameManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        timeText.text = _initialTimeText;
+        LaserManager.SheepSound = sheepdSound;
+        timeText.text = InitialTimeText;
         
         _sheeps = new GameObject[maxSheeps];
         _diamonds = new GameObject[maxDiamonds];
 
         GameObject ship = Instantiate(Resources.Load("spaceship"), parent: shipParent.transform) as GameObject;
         followingCamera.Follow = ship.transform;
-
-        bool eviled = false;
+        
         int maxLen = Math.Max(maxDiamonds, maxSheeps);
         for (int i = 0; i < maxLen; i++)
         {
@@ -61,26 +62,13 @@ public class GameManager : MonoBehaviour
             {
                 NumSheeps++;
                 randomPos = new(Random.Range(_minPosition.x, _maxPosition.x),
-                    Random.Range(_minPosition.y, _maxPosition.y),
-                    Random.Range(_minPosition.z, _maxPosition.z));
-
-                string sheepType = !eviled ? "EvilSheep" : _sheepsTypes[Random.Range(0, _sheepPrefabs)];
-                eviled = true;
-                // if (!eviled)
-                // {
-                //     sheepType = "EvilSheep";
-                //     eviled = true;
-                // }
-                // else
-                // {
-                //     sheepType = _sheepsTypes[Random.Range(0, _sheepPrefabs)];   
-                // }
-
+                    Random.Range(_minPosition.y, _maxPosition.y));
+                
+                string sheepType = i == 0 ? "EvilSheep" : _sheepsTypes[Random.Range(0, SheepPrefabs)];
+                
                 GameObject tempSheep =
                     Instantiate(Resources.Load(sheepType), randomPos, Quaternion.identity, sheepParent.transform) as
                         GameObject;
-                
-                // tempSheep.transform.localScale = new Vector3(1, 1, 0);
                 
                 _sheeps[i] = tempSheep;
             }
@@ -90,10 +78,8 @@ public class GameManager : MonoBehaviour
             {
                 NumDiamonds++;
                 randomPos = new Vector3(Random.Range(_minPosition.x, _maxPosition.x),
-                    Random.Range(_minPosition.y, _maxPosition.y),
-                    Random.Range(_minPosition.z, _maxPosition.z));
-                string diamondType = _diamondsTypes[Random.Range(0, _diamondPrefabs)];
-                // print(diamondType);
+                    Random.Range(_minPosition.y, _maxPosition.y));
+                string diamondType = i == 0 ? "Red_3p" : _diamondsTypes[Random.Range(0, DiamondPrefabs)];
                 GameObject tempDiamond =
                     Instantiate(Resources.Load(diamondType), randomPos, Quaternion.identity, diamondParent.transform) as GameObject;
                 _diamonds[i] = tempDiamond;
@@ -109,12 +95,6 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        _currentSeconds += Time.deltaTime;
-        int minutes = ((int)(_currentSeconds / 60)) % 60;
-        int seconds = ((int)_currentSeconds) % 60;
-        // Showing the elapsed time in game
-        timeText.text = _initialTimeText + $"{minutes:00}:{seconds:00}";
-
         _fpsCounter++;
         _fpsTime -= Time.deltaTime;
 
@@ -125,6 +105,13 @@ public class GameManager : MonoBehaviour
             _fpsCounter = 0;
             _fpsTime = 1;
         }
+
+        _currentSeconds += Time.deltaTime;
+        int minutes = ((int)(_currentSeconds / 60)) % 60;
+        int seconds = ((int)_currentSeconds) % 60;
+        
+        // Showing the elapsed time in game
+        timeText.text = InitialTimeText + $"{minutes:00}:{seconds:00}";
 
         // reshow hidden sheeps after a certain time
         if (NumSheeps < maxSheeps)

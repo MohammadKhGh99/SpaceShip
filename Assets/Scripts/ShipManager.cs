@@ -13,6 +13,9 @@ public class ShipManager : MonoBehaviour
     [SerializeField] private Rigidbody2D shipRb;
     [SerializeField] private GameObject bulletsParent;
     [SerializeField] private int maxBullets;
+    [SerializeField] private AudioSource laserSound;
+    [SerializeField] private AudioSource diamondSound;
+    [SerializeField] private AudioSource evilSound;
     
     public static int NumBullets;
     private float _bulletCoolDown = 0.5f;
@@ -21,16 +24,33 @@ public class ShipManager : MonoBehaviour
     private GameObject[] _bullets;
     private ScoreManager _manager;
 
+    private bool _showCurScore;
+    private float _evilTextTime;
+
     // Start is called before the first frame update
     void Start()
     {
+        _showCurScore = false;
         _bullets = new GameObject[maxBullets];
         _manager = ScoreManager.Instance;
+        _evilTextTime = 1;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (_showCurScore)
+        {
+            _evilTextTime -= Time.deltaTime;
+            if (_evilTextTime <= 0)
+            {
+                _manager.ActiveEvil(false);
+                _showCurScore = false;
+                _evilTextTime = 1;
+            }
+        }
+        
+
         if (_initialBulletsNum == maxBullets)
         {
             _firstShooting = false;
@@ -40,6 +60,7 @@ public class ShipManager : MonoBehaviour
 
         if (!Input.GetKeyDown(KeyCode.Space) || NumBullets >= maxBullets || _bulletCoolDown > 0) return;
         
+        laserSound.Play();
         _bulletCoolDown = 0.5f;
         Vector3 tempPos = shipRb.transform.position;
         Vector3 toPos = new Vector3(tempPos.x, tempPos.y + 3.5f, tempPos.z);
@@ -69,25 +90,21 @@ public class ShipManager : MonoBehaviour
         if (Input.GetKey(KeyCode.UpArrow))
         {
             shipRb.AddForce(Vector2.up * shipMoveSpeed);
-            // shipBody.transform.position += shipBody.transform.up * (shipMoveSpeed * Time.deltaTime);
         }
 
         if (Input.GetKey(KeyCode.DownArrow))
         {
             shipRb.AddForce(Vector2.down * shipMoveSpeed);
-            // shipBody.transform.position -= shipBody.transform.up * (shipMoveSpeed * Time.deltaTime);
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
             shipRb.AddForce(Vector2.left * shipMoveSpeed);
-            // shipBody.transform.position += shipBody.transform * (shipMoveSpeed * Time.deltaTime);
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
             shipRb.AddForce(Vector2.right * shipMoveSpeed);
-            // shipBody.transform.position -= shipBody.transform.forward * (shipMoveSpeed * Time.deltaTime);
         }
     }
 
@@ -99,6 +116,10 @@ public class ShipManager : MonoBehaviour
             col.gameObject.SetActive(false);
             GameManager.Score++;
             _manager.UpdateScore();
+            _manager.UpdateCurrent(1);
+            _manager.ActiveEvil(true);
+            _showCurScore = true;
+            diamondSound.Play();
         }
         if (col.gameObject.name.StartsWith("Blue"))
         {
@@ -106,6 +127,10 @@ public class ShipManager : MonoBehaviour
             col.gameObject.SetActive(false);
             GameManager.Score += 2;
             _manager.UpdateScore();
+            _manager.UpdateCurrent(2);
+            _manager.ActiveEvil(true);
+            _showCurScore = true;
+            diamondSound.Play();
         }
         if (col.gameObject.name.StartsWith("Red"))
         {
@@ -113,6 +138,10 @@ public class ShipManager : MonoBehaviour
             col.gameObject.SetActive(false);
             GameManager.Score += 3;
             _manager.UpdateScore();
+            _manager.UpdateCurrent(3);
+            _manager.ActiveEvil(true);
+            _showCurScore = true;
+            diamondSound.Play();
         }
     }
 
@@ -122,6 +151,10 @@ public class ShipManager : MonoBehaviour
         {
             GameManager.Score -= 3;
             _manager.UpdateScore();
+            _manager.UpdateCurrent(-3);
+            _manager.ActiveEvil(true);
+            _showCurScore = true;
+            evilSound.Play();
         }
     }
 }
